@@ -26,3 +26,12 @@ docker run -v quiche:/src/quiche -d --name quiche quiche
 dart ffi_dart.dart
 Libquiche version 0.3.0
 ```
+
+
+# TODO
+
+implementation
+
+tests
+
+lint (dartanalyzer --options analysis_options.yaml .)
