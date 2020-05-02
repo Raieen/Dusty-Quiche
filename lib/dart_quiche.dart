@@ -12,10 +12,11 @@ void main() {
 
   final config = quiche_h3_config_new();
 
-  print(config.max_header_list_size);
-  print("0x${config.addressOf.address.toRadixString(16)}");
-  quiche_h3_config_set_max_header_list_size(config, 123);
-  print(config.max_header_list_size);
+  // print(config.max_header_list_size);
+  // print("0x${config.addressOf.address.toRadixString(16)}");
+  // quiche_h3_config_set_max_header_list_size(config, 123);
+  // print(config.max_header_list_size);
+  quiche_config_set_cc_algorithm(config, QuicheCCAlgorithm.cc_reno);
 }
 
 // quiche_version
@@ -54,6 +55,30 @@ void quiche_h3_config_set_max_header_list_size(Http3Config config, int value) {
   libquiche.lookupFunction<quiche_h3_config_set_max_header_list_size_c,
           quiche_h3_config_set_max_header_list_size_dart>(
       "quiche_h3_config_set_max_header_list_size")(config.addressOf, value);
+}
+
+// quiche_config_set_cc_algorithm
+
+abstract class QuicheCCAlgorithm {
+  static const int cc_reno = 0;
+  static const int cc_cubic = 1;
+}
+
+typedef quiche_config_set_cc_algorithm_c = Void Function(
+    Pointer<Http3Config>, Uint8);
+typedef quiche_config_set_cc_algorithm_dart = void Function(
+    Pointer<Http3Config>, int);
+
+void quiche_config_set_cc_algorithm(Http3Config config, int algorithm) {
+  if (algorithm != QuicheCCAlgorithm.cc_reno &&
+      algorithm != QuicheCCAlgorithm.cc_cubic) {
+    throw "Unsupported algorithm";
+  }
+
+  libquiche.lookupFunction<quiche_config_set_cc_algorithm_c,
+              quiche_config_set_cc_algorithm_dart>(
+          "quiche_config_set_cc_algorithm")(
+      config.addressOf, algorithm);
 }
 
 class Http3Config extends Struct {
