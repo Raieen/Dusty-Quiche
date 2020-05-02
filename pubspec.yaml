@@ -1,0 +1,6 @@
+name: ffi_dart
+version: 0.0.1
+environment:
+  sdk: '>=2.6.0 <3.0.0'
+dependencies:
+  ffi: ^0.1.3
