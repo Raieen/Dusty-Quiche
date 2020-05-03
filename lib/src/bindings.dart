@@ -1,26 +1,15 @@
+
 import 'dart:ffi';
 
 import 'package:ffi/ffi.dart';
+import 'package:dusty_quiche/src/types.dart';
 
 import 'utils/ffi_extentions.dart';
 
 // Load Quiche
 DynamicLibrary libquiche = DynamicLibrary.open("./bin/libquiche.so");
 
-void main() {
-  print("Libquiche version ${quiche_version()}");
-
-  final config = quiche_h3_config_new();
-
-  // print(config.max_header_list_size);
-  // print("0x${config.addressOf.address.toRadixString(16)}");
-  // quiche_h3_config_set_max_header_list_size(config, 123);
-  // print(config.max_header_list_size);
-  quiche_config_set_cc_algorithm(config, QuicheCCAlgorithm.cc_reno);
-}
-
 // quiche_version
-
 typedef _quiche_version_c = Pointer<Utf8> Function();
 typedef _quiche_version_dart = Pointer<Utf8> Function();
 
@@ -31,14 +20,43 @@ String quiche_version() {
       .nativeString();
 }
 
+// TODO: Reference https://github.com/dart-lang/sdk/issues/37301
+int quiche_enable_debug_logging() {}
+
+// quiche_config_new
+
+typedef _quiche_config_new_c = Pointer<Config> Function(Uint32);
+typedef _quiche_config_new_dart = Pointer<Config> Function(int);
+
+// 0xbabababa
+Config quiche_config_new(int version) {
+  return libquiche
+      .lookupFunction<_quiche_config_new_c, _quiche_config_new_dart>(
+          "quiche_config_new")(version)
+      .ref;
+}
+
+// quiche_config_set_max_idle_timeout
+
+typedef _quiche_config_set_max_idle_timeout_c = Void Function(
+    Pointer<Config> config, Uint64 value);
+typedef _quiche_config_set_max_idle_timeout_dart = void Function(
+    Pointer<Config> config, int value);
+
+void quiche_config_set_max_idle_timeout(Config config, int value) {
+  libquiche.lookupFunction<_quiche_config_set_max_idle_timeout_c,
+          _quiche_config_set_max_idle_timeout_dart>(
+      "quiche_config_set_max_idle_timeout")(config.addressOf, value);
+}
+
 // quiche_h3_config_new
 
 typedef _quiche_h3_config_new_c = Pointer<Http3Config> Function();
-typedef quiche_h3_config_new_dart = Pointer<Http3Config> Function();
+typedef _quiche_h3_config_new_dart = Pointer<Http3Config> Function();
 
 Http3Config quiche_h3_config_new() {
   return libquiche
-      .lookupFunction<_quiche_h3_config_new_c, quiche_h3_config_new_dart>(
+      .lookupFunction<_quiche_h3_config_new_c, _quiche_h3_config_new_dart>(
           "quiche_h3_config_new")()
       .ref;
 }
@@ -76,28 +94,6 @@ void quiche_config_set_cc_algorithm(Http3Config config, int algorithm) {
   }
 
   libquiche.lookupFunction<quiche_config_set_cc_algorithm_c,
-              quiche_config_set_cc_algorithm_dart>(
-          "quiche_config_set_cc_algorithm")(
-      config.addressOf, algorithm);
-}
-
-class Http3Config extends Struct {
-  @Uint64()
-  int max_header_list_size; // These are actually Options in rust, so null = 0 and something = 1
-  // I need to figure out how to do option.unwrap here...
-  // Do I re-implement this?
-  // https://github.com/rust-lang/rust/blob/45c7838089576552391237bb41cdd3d46582d3e5/src/libcore/option.rs#L167
-
-  @Uint64()
-  int qpack_max_table_capacity;
-
-  @Uint64()
-  int qpack_blocked_streams;
-
-  factory Http3Config.allocate(int max_header_list_size,
-          int qpack_max_table_capacity, int qpack_blocked_streams) =>
-      allocate<Http3Config>().ref
-        ..max_header_list_size = max_header_list_size
-        ..qpack_max_table_capacity = qpack_max_table_capacity
-        ..qpack_blocked_streams = qpack_blocked_streams;
+          quiche_config_set_cc_algorithm_dart>(
+      "quiche_config_set_cc_algorithm")(config.addressOf, algorithm);
 }
