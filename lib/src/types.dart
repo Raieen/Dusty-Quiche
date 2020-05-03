@@ -27,3 +27,8 @@ class Http3Config extends Struct {
         ..qpack_max_table_capacity = qpack_max_table_capacity
         ..qpack_blocked_streams = qpack_blocked_streams;
 }
+
+abstract class QuicheCCAlgorithm {
+  static const int cc_reno = 0;
+  static const int cc_cubic = 1;
+}

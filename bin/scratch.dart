@@ -1,8 +1,9 @@
 import 'dart:convert';
 
-import 'package:dusty_quiche/src/bindings.dart';
+import 'package:dusty_quiche/src/bindings/bindings.dart';
+import 'package:dusty_quiche/src/bindings/config_bindings.dart';
+import 'package:dusty_quiche/src/bindings/h3_bindings.dart';
 import 'package:dusty_quiche/src/constants.dart';
-import 'package:ffi/ffi.dart';
 
 void main() {
   print("Libquiche version ${quiche_version()}");
@@ -15,7 +16,7 @@ void main() {
   // quiche_config_set_cc_algorithm(http3config, QuicheCCAlgorithm.cc_reno);
 
   quiche_config_set_application_protos(config, QUICHE_H3_APPLICATION_PROTOCOL);
-
+  quiche_config_set_disable_active_migration(config, false);
   final x = [5, 104, 51, 45, 50, 55, 5, 104, 51, 45, 50, 53, 5, 104, 51, 45, 50, 52, 5, 104, 51, 45, 50, 51];
   print(utf8.decode(x));
 }
