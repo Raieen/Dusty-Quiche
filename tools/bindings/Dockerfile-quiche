@@ -1,0 +1,9 @@
+FROM rust:1.43.0
+
+WORKDIR /src/quiche
+RUN git clone --recursive https://github.com/cloudflare/quiche /src/quiche
+
+# Need cmake to build BoringSSL
+RUN apt-get update && apt-get install -y cmake
+
+CMD ["cargo", "build"]

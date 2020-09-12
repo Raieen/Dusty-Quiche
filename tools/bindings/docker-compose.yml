@@ -1,0 +1,17 @@
+version: "3.4"
+
+services:
+  quiche:
+    container_name: quiche_build
+    build:
+      context: .
+      dockerfile: Dockerfile-quiche
+    volumes:
+      - ./quiche-output:/src/quiche/target/debug
+  ffigen:
+    container_name: quiche_ffigen
+    build:
+      context: .
+      dockerfile: Dockerfile-ffigen
+    volumes:
+      - ./quiche-output:/src/ffigen/output

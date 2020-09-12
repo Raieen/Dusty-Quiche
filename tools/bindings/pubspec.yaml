@@ -1,0 +1,11 @@
+name: dusty_quiche_ffigen
+version: 0.1.0
+environment:
+  sdk: '>=2.6.0 <3.0.0'
+dependencies:
+  ffigen: ^0.2.1+1
+ffigen:
+  output: './output/quiche_bindings.g.dart'
+  headers:
+    entry-points:
+      - 'quiche.h'
