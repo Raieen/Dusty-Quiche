@@ -1,0 +1,23 @@
+FROM ubuntu:20.10
+
+WORKDIR /src/ffigen
+
+ADD quiche.h /src/ffigen/
+ADD pubspec.* /src/ffigen/
+
+# Packages for installing Dart, apt-transport-https gnupg2 wget
+# ffigen relies on clang libclang-dev
+RUN apt-get update && apt-get install -y apt-transport-https gnupg2 wget clang libclang-dev
+
+# Install Dart
+RUN sh -c 'wget -qO- https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -'
+RUN sh -c 'wget -qO- https://storage.googleapis.com/download.dartlang.org/linux/debian/dart_stable.list > /etc/apt/sources.list.d/dart_stable.list'
+RUN apt-get update
+RUN apt-get install -y dart
+RUN export PATH="$PATH:/usr/lib/dart/bin"
+# Fix where dart command is present but pub is not https://stackoverflow.com/a/61497143
+RUN ln -s /usr/lib/dart/bin/pub /usr/bin/pub
+
+# ffigen
+RUN pub get && pub run ffigen:setup
+ENTRYPOINT [ "pub", "run", "ffigen" ]
